@@ -1,0 +1,42 @@
+services:
+
+  marketbot-app:
+    build: .
+    container_name: marketbot-app
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      # Database URL for SQLAlchemy, format: postgresql://user:password@host:port/dbname
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/marketbot_db
+      FACEBOOK_SESSION_COOKIE: your_fb_session_cookie_here
+      NTFY_API_ENDPOINT: https://ntfy.example.com/your-topic
+      NTFY_API_KEY: your_ntfy_api_key
+      SMTP_SERVER: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USERNAME: your_email@example.com
+      SMTP_PASSWORD: your_email_password
+      EMAIL_FROM: your_email@example.com
+      EMAIL_TO: recipient@example.com
+      FLASK_ENV: development
+      FLASK_APP: app.py          # Or your actual flask app entrypoint filename
+    volumes:
+      - .:/app
+    command: flask run --host=0.0.0.0
+
+  db:
+    image: postgres:15-alpine
+    container_name: marketbot-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: marketbot_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

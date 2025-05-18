@@ -1,0 +1,12 @@
+services:
+
+  crawler:
+    build: .
+    container_name: marketbot-crawler
+    ports:
+      - "3333:3333"
+    env_file:
+      - local.env
+    volumes:
+      - .:/app
+
