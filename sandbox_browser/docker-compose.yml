@@ -1,0 +1,25 @@
+
+services:
+  selenium-chrome:
+    image: selenium/standalone-chrome-debug:latest
+    container_name: sandbox-browser
+    ports:
+      - "4444:4444"   # selenium
+      - "5900:5900"   # vnc
+    shm_size: 2gb     # Increase /dev/shm size for Chrome stability
+    volumes:
+      - chrome_data:/home/selenium/.config/google-chrome  # persist Chrome profile across restarts
+    environment:
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1080
+      - SCREEN_DEPTH=24
+    networks:
+      - default
+      - bot-network
+
+volumes:
+  chrome_data:
+networks:
+  default:
+  bot-network:
+    external: true

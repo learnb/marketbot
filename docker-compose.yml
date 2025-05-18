@@ -9,4 +9,11 @@ services:
       - local.env
     volumes:
       - .:/app
+    networks:
+      - default
+      - bot-network
 
+networks:
+  default:
+  bot-network:
+    external: true
