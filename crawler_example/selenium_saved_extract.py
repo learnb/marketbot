@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import json
 
 # init selenium
 selenium_url = "http://sandbox-browser:4444/wd/hub"
@@ -14,32 +15,35 @@ driver = webdriver.Remote(
 )
 
 # open marketplace and wait for manual login
+print("opening marketplace")
 driver.get("https://www.facebook.com/marketplace")
-wait = WebDriverWait(driver, 600) # wait max 10 minutes for login
+
 print("Please manually log in via the browser windows")
+wait = WebDriverWait(driver, 600) # wait max 10 minutes for login
 wait.until(EC.invisibility_of_element_located((By.ID, "login_popup_cta_form")))
 
+# TODO: exit process and notify if no login
 print("Login detected, proceeding...")
 
 
+print("sleeping for a minute..")
 time.sleep(60) # sleep, in case of human check
-print("sleep complete")
 
 
 # open saved items page
-driver.get("https://www.facebook.com/marketplace/you/saved")
 print("opening saved items page")
+driver.get("https://www.facebook.com/marketplace/you/saved")
 
 
 # wait for page and listings to load
+print("waiting until page load complete")
 wait = WebDriverWait(driver, 15)
 items_container = wait.until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "div[role='main']"))
 )
-print("page load wait complete")
 
+print("sleeping for 10 seconds")
 time.sleep(10)
-print("sleep complete")
 
 # scroll to load all saved items
 def scroll_to_bottom():
@@ -79,12 +83,11 @@ for item_link in items:
         price = price_el.text if price_el else "Unknown"
 
         # Title: from the span with the two-line clamp style (or fallback to text of link)
-        # given your example: span with style -webkit-line-clamp: 2
         title_el = item_link.find_element(By.XPATH, ".//span[contains(@style, '-webkit-line-clamp: 2')]")
         title = title_el.text if title_el else item_link.text
 
         # Location: span near bottom (last span inside the link)
-        # We look for span inside a div near the end with text (assuming location format)
+        # look for span inside a div near the end with text (assuming location format)
         location_el = item_link.find_elements(By.XPATH, ".//span")[-1]
         location = location_el.text if location_el else "Unknown"
 
@@ -101,9 +104,11 @@ for item_link in items:
         continue
 
 # print results
-for result in results:
-    print(f"---\n{result}\n---\n")
+#for result in results:
+#    print(f"---\n{result}\n---\n")
 
-
+# save results to file in json format
+with open("saved_items.json", "w") as f:
+    json.dump(results, f, indent=4)
 
 
